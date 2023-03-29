@@ -1,12 +1,8 @@
-import selenium
-import bs4
-import requests
-
-import constants
+import scrapper
 
 
 def main():
-    pass
+    scr = scrapper.Scrapper()
 
 
 if __name__ == '__main__':
