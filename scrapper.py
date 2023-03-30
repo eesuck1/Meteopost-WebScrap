@@ -4,6 +4,7 @@ import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
+from selenium.webdriver.support.ui import Select
 import bs4
 
 import constants
@@ -42,8 +43,15 @@ class Scrapper:
         self.browser = webdriver.Edge(options=self.options)
         self.browser.get(constants.URL)
 
+        self.__full_parse__()
         self.__update__()
         self.__parse__(self.browser.page_source)
+
+    def __full_parse__(self):
+        years = self.browser.find_element(By.XPATH, constants.YEAR_XPATH)
+
+        for year in Select(years).options:
+            print(year.text)
 
     def __update__(self):
         selected_element = self.browser.find_element(By.XPATH, constants.SELECT_XPATH)
