@@ -3,15 +3,19 @@ import re
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.edge.options import Options
 import bs4
-import requests
 
 import constants
 
 
 class Scrapper:
     __instance__ = None
+
+    def __init__(self):
+        self.browser = None
+        self.options = None
+        self.soup = None
 
     def __new__(cls, *args, **kwargs):
         if Scrapper.__instance__ is None:
@@ -32,9 +36,16 @@ class Scrapper:
         print(f"[INFO] Work is done.")
 
     def scrap(self):
-        self.browser = webdriver.Edge()
+        self.options = Options()
+        self.options.headless = True
+
+        self.browser = webdriver.Edge(options=self.options)
         self.browser.get(constants.URL)
 
+        self.__update__()
+        self.__parse__(self.browser.page_source)
+
+    def __update__(self):
         selected_element = self.browser.find_element(By.XPATH, constants.SELECT_XPATH)
         selected_element.click()
 
@@ -43,8 +54,9 @@ class Scrapper:
         button = self.browser.find_element(By.XPATH, constants.BUTTON_XPATH)
         button.click()
 
-        soup = bs4.BeautifulSoup(self.browser.page_source, "html.parser")
+    def __parse__(self, page_source: str):
+        self.soup = bs4.BeautifulSoup(page_source, "html.parser")
 
-        columns = soup.find_all("td", text=re.compile(r'[+-]\d+'))
+        columns = self.soup.find_all("td", text=re.compile(r'-|\d+'))
         for column in columns:
             print(column.text)
