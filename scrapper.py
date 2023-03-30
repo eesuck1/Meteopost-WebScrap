@@ -13,21 +13,17 @@ import constants
 class Scrapper:
     __instance__ = None
 
-    def __init__(self):
-        self.browser = None
-        self.options = None
-        self.soup = None
-        self.generator = None
-
     def __new__(cls, *args, **kwargs):
         if Scrapper.__instance__ is None:
             Scrapper.__instance__ = super().__new__(cls)
 
-            Scrapper.__start_info__()
-            Scrapper.scrap(Scrapper.__instance__)
-            Scrapper.__done_info__()
-
         return Scrapper.__instance__
+
+    def __init__(self):
+        self.__browser__ = None
+        self.__options__ = None
+        self.__soup__ = None
+        self.__dictionary__ = None
 
     @staticmethod
     def __start_info__():
@@ -37,37 +33,51 @@ class Scrapper:
     def __done_info__():
         print(f"[INFO] Work is done.")
 
-    def scrap(self):
-        self.options = Options()
-        self.options.headless = False
+    def scrap(self) -> None:
+        self.__start_info__()
 
-        self.browser = webdriver.Edge(options=self.options)
-        self.browser.get(constants.URL)
+        self.__dictionary__ = {category: [] for category in constants.CATEGORIES}
+        self.__options__ = Options()
+        self.__options__.headless = True
+
+        self.__browser__ = webdriver.Edge(options=self.__options__)
+        self.__browser__.get(constants.URL)
 
         self.__full_parse__()
 
-    def __full_parse__(self):
-        self.years = Select(self.browser.find_element(By.XPATH, constants.YEAR_XPATH))
+        self.__done_info__()
+
+    def __full_parse__(self) -> None:
+        self.years = Select(self.__browser__.find_element(By.XPATH, constants.YEAR_XPATH))
 
         for i in range(len(self.years.options)):
-            self.years = Select(self.browser.find_element(By.XPATH, constants.YEAR_XPATH))
+            self.years = Select(self.__browser__.find_element(By.XPATH, constants.YEAR_XPATH))
             self.years.select_by_index(i)
 
             self.__update__()
-            self.__parse__(self.browser.page_source)
+            self.__parse__(self.__browser__.page_source, "Lviv")
 
-    def __update__(self):
-        selected_element = self.browser.find_element(By.XPATH, constants.SELECT_XPATH)
+    def __update__(self) -> None:
+        selected_element = self.__browser__.find_element(By.XPATH, constants.SELECT_XPATH)
         selected_element.click()
 
         selected_element.find_element(By.XPATH, constants.LVIV_FIELD_XPATH).click()
 
-        button = self.browser.find_element(By.XPATH, constants.BUTTON_XPATH)
+        button = self.__browser__.find_element(By.XPATH, constants.BUTTON_XPATH)
         button.click()
 
-    def __parse__(self, page_source: str):
-        self.soup = bs4.BeautifulSoup(page_source, "html.parser")
+    def __parse__(self, page_source: str, city: str) -> None:
+        self.__soup__ = bs4.BeautifulSoup(page_source, "html.parser")
+        columns = self.__soup__.find_all("td", text=re.compile(r'-|\d+'))
 
-        columns = self.soup.find_all("td", text=re.compile(r'-|\d+'))
-        for column in columns:
-            print(column.text)
+        for index, column in enumerate(columns):
+            if index % len(constants.CATEGORIES[1:]) == 0:
+                self.__dictionary__[constants.CATEGORIES[0]].append(city)
+
+            self.__dictionary__[constants.CATEGORIES[1:][index % len(constants.CATEGORIES[1:])]].append(column.text)
+
+    def get_data(self) -> dict:
+        if self.__dictionary__:
+            return self.__dictionary__
+
+        return {}
