@@ -5,13 +5,12 @@ import dataset
 def main():
     scr = scrapper.Scrapper()
     scr.scrap()
-
-    dictionary = scr.get_data()
-    print(dictionary)
-
-    data = dataset.Dataset(dictionary)
-
-    data.create_excel(data.create_path("Data", "sheet"))
+    #
+    # dictionary = scr.get_data()
+    #
+    # data = dataset.Dataset(dictionary)
+    #
+    # data.create_excel(data.create_path("Data", "sheet"))
 
 
 if __name__ == '__main__':
