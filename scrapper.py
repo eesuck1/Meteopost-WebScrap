@@ -17,6 +17,7 @@ class Scrapper:
         self.browser = None
         self.options = None
         self.soup = None
+        self.generator = None
 
     def __new__(cls, *args, **kwargs):
         if Scrapper.__instance__ is None:
@@ -38,20 +39,22 @@ class Scrapper:
 
     def scrap(self):
         self.options = Options()
-        self.options.headless = True
+        self.options.headless = False
 
         self.browser = webdriver.Edge(options=self.options)
         self.browser.get(constants.URL)
 
         self.__full_parse__()
-        self.__update__()
-        self.__parse__(self.browser.page_source)
 
     def __full_parse__(self):
-        years = self.browser.find_element(By.XPATH, constants.YEAR_XPATH)
+        self.years = Select(self.browser.find_element(By.XPATH, constants.YEAR_XPATH))
 
-        for year in Select(years).options:
-            print(year.text)
+        for i in range(len(self.years.options)):
+            self.years = Select(self.browser.find_element(By.XPATH, constants.YEAR_XPATH))
+            self.years.select_by_index(i)
+
+            self.__update__()
+            self.__parse__(self.browser.page_source)
 
     def __update__(self):
         selected_element = self.browser.find_element(By.XPATH, constants.SELECT_XPATH)
