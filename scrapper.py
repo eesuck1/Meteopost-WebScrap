@@ -80,8 +80,8 @@ class Scrapper:
                 button.click()
 
                 self.__parse__(self.__browser__.page_source, city)
-            except WebDriverException:
-                continue
+            except WebDriverException as exception:
+                print(f"[INFO] Exception cause: {exception.__cause__}\n[INFO] Exception context: {exception.__context__}")
 
     def __parse__(self, page_source: str, city: str) -> None:
         self.__soup__ = bs4.BeautifulSoup(page_source, "html.parser")
