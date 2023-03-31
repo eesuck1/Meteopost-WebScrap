@@ -5,7 +5,16 @@ import pandas
 
 class Dataset:
     def __init__(self, dictionary: dict):
-        self.__data_frame__ = pandas.DataFrame(dictionary)
+        self.__data_frame__ = pandas.DataFrame(self.__check_dictionary__(dictionary))
+
+    @staticmethod
+    def __check_dictionary__(dictionary: dict) -> dict:
+        lengths = [len(value) for value in dictionary.values()]
+
+        for key in dictionary:
+            dictionary[key] = dictionary[key][:min(lengths)]
+
+        return dictionary
 
     @staticmethod
     def create_path(folder_name: str, file_name: str) -> str:
@@ -19,3 +28,6 @@ class Dataset:
 
     def create_excel(self, path: str) -> None:
         self.__data_frame__.to_excel(path + ".xlsx", index=False)
+
+    def get_data_frame(self) -> pandas.DataFrame:
+        return self.__data_frame__
