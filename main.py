@@ -2,8 +2,7 @@ import scrapper
 
 
 def main():
-    scr = scrapper.Scrapper()
-    scr.scrap("Data")
+    scrap = scrapper.Scrapper()
 
 
 if __name__ == '__main__':

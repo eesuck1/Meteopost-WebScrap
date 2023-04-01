@@ -19,6 +19,8 @@ class Scrapper:
         if Scrapper.__instance__ is None:
             Scrapper.__instance__ = super().__new__(cls)
 
+            Scrapper.scrap(Scrapper.__instance__)
+
         return Scrapper.__instance__
 
     def __init__(self):
@@ -39,7 +41,7 @@ class Scrapper:
     def __create_dictionary__(self) -> None:
         self.__dictionary__ = {category: [] for category in constants.CATEGORIES}
 
-    def scrap(self, result_folder: str) -> None:
+    def scrap(self, result_folder: str = "Data") -> None:
         self.__start_info__()
 
         self.__options__ = Options()
@@ -80,8 +82,8 @@ class Scrapper:
                 button.click()
 
                 self.__parse__(self.__browser__.page_source, city)
-            except WebDriverException:
-                continue
+            except WebDriverException as exception:
+                print(f"[INFO] Exception cause: {exception.__cause__}\n[INFO] Exception context: {exception.__context__}")
 
     def __parse__(self, page_source: str, city: str) -> None:
         self.__soup__ = bs4.BeautifulSoup(page_source, "html.parser")
