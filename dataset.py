@@ -4,8 +4,15 @@ import pandas
 
 
 class Dataset:
-    def __init__(self, dictionary: dict):
+    def __init__(self, dictionary=None):
+        if dictionary is None:
+            dictionary = {}
+
         self.__data_frame__ = pandas.DataFrame(self.__check_dictionary__(dictionary))
+        self.__formats_dictionary__ = {
+            ".csv": pandas.read_csv,
+            ".xlsx": pandas.read_excel,
+        }
 
     @staticmethod
     def __check_dictionary__(dictionary: dict) -> dict:
@@ -31,3 +38,16 @@ class Dataset:
 
     def get_data_frame(self) -> pandas.DataFrame:
         return self.__data_frame__
+
+    def concatenate_frame(self, folder: str, file_format: str, result_name: str, to_save: bool) -> pandas.DataFrame:
+        concatenated_frame = pandas.DataFrame()
+
+        for file in os.listdir(folder):
+            if file.endswith(file_format):
+                temporary = self.__formats_dictionary__[file_format](self.create_path(folder, file))
+
+                concatenated_frame = pandas.concat([concatenated_frame, temporary], ignore_index=True)
+        if to_save:
+            concatenated_frame.to_csv(self.create_path(folder, result_name + file_format), index=False)
+
+        return concatenated_frame
