@@ -51,3 +51,4 @@ class Dataset:
             concatenated_frame.to_csv(self.create_path(folder, result_name + file_format), index=False)
 
         return concatenated_frame
+
