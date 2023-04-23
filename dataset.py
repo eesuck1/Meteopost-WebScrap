@@ -78,6 +78,9 @@ class Dataset:
         for column in columns[3:]:
             prepared[column] = prepared[column].astype(float)
 
+        prepared.columns = ['City', 'Year', 'Month', 'Average Temperature (celsius)', 'Max Temperature (celsius)',
+                            'Min Temperature (celsius)', 'Average Wind Speed (m/s)', 'Total Precipitation (mm)', 'Max Snow Depth (cm)']
+
         prepared.to_csv(self.create_path(save_folder, result_name + file_format), index=False)
 
         return prepared
