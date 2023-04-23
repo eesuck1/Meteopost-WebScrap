@@ -1,8 +1,10 @@
-import scrapper
+import dataset
 
 
 def main():
-    scrap = scrapper.Scrapper()
+    frame = dataset.Dataset()
+
+    frame.prepare_frame("Data", ".csv", "data", True, "Prepared")
 
 
 if __name__ == '__main__':
